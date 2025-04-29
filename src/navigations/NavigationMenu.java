@@ -5,6 +5,8 @@ import java.util.Scanner;
 public class NavigationMenu {
     private static final Scanner SCANNER = new Scanner(System.in);
 
+    private static int cipherShift;
+    private static String pathOfFile;
     private static final String HEADER = """
             Ниже Вам представлен список доступных операций!
             
@@ -46,7 +48,22 @@ public class NavigationMenu {
                     System.out.println(END);
                     System.exit(0);
                 }
-                case 1:
+                case 1: {
+                    while (true) {
+                        System.out.print("Введите число для кодирования: ");
+
+                        if (!SCANNER.hasNextInt()) {
+                            System.out.println(WRONG_CHOICE);
+                            System.out.println(SEPARATOR);
+                            Thread.sleep(1000);
+                            SCANNER.nextLine();
+                            continue;
+                        }
+                        cipherShift = SCANNER.nextInt();
+                        SCANNER.nextLine();
+                        showCryptMenu();
+                    }
+                }
                 case 2:
                 case 3:
                     showCryptMenu();
@@ -82,6 +99,14 @@ public class NavigationMenu {
                 case 0: {
                     System.out.println(END);
                     System.exit(0);
+                }
+                case 1: {
+                    System.out.print("Введите путь к файлу, вместе с его именем и расширением: ");
+                    pathOfFile = SCANNER.nextLine();
+                }
+                case 2: {
+                    System.out.print("Введите имя файла и его расширение: ");
+                    pathOfFile = SCANNER.nextLine();
                 }
                 case 9: showMainMenu();
                 default:

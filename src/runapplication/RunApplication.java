@@ -5,7 +5,6 @@ import navigations.NavigationMenu;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class RunApplication {
-    static int cipherShift;
 
     public static void main(String[] args) throws InterruptedException {
         System.out.println("""
