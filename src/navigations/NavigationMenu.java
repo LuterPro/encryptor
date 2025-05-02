@@ -1,5 +1,9 @@
 package navigations;
 
+import encoder.Encoder;
+import filemaneger.FileManager;
+
+import java.io.IOException;
 import java.util.Scanner;
 
 public class NavigationMenu {
@@ -7,6 +11,7 @@ public class NavigationMenu {
 
     private static int cipherShift;
     private static String pathOfFile;
+    private static int currentMode;
     private static final String HEADER = """
             Ниже Вам представлен список доступных операций!
             
@@ -21,9 +26,17 @@ public class NavigationMenu {
     private static final String CHOICE = "Ваш выбор: ";
     private static final String WRONG_CHOICE = "Введите пожалуйста номер операции из перечисленных в меню!";
     private static final String FILE_FROM_DIRECTORY_ON_PC = "1 - Укажу путь к файлу на моём ПК";
-    private static final String FILE_FROM_NAME = "2 - Укажу имя файла";
+    private static final String FILE_FROM_NAME = "2 - Использовать файл по умолчанию";
 
-    public static void showMainMenu() throws InterruptedException {
+//    public static int getCipherShift() {
+//        return cipherShift;
+//    }
+//
+//    public static int getCurrentMode() {
+//        return currentMode;
+//    }
+
+    public static void showMainMenu() throws InterruptedException, IOException {
         while (true) {
             System.out.println(HEADER);
             System.out.println(ENCRYPT);
@@ -50,6 +63,7 @@ public class NavigationMenu {
                 }
                 case 1: {
                     while (true) {
+                        currentMode = 1;
                         System.out.print("Введите число для кодирования: ");
 
                         if (!SCANNER.hasNextInt()) {
@@ -64,18 +78,36 @@ public class NavigationMenu {
                         showCryptMenu();
                     }
                 }
-                case 2:
-                case 3:
+                case 2: {
+                    while (true) {
+                        currentMode = 2;
+                        System.out.print("Введите число для кодирования: ");
+
+                        if (!SCANNER.hasNextInt()) {
+                            System.out.println(WRONG_CHOICE);
+                            System.out.println(SEPARATOR);
+                            Thread.sleep(1000);
+                            SCANNER.nextLine();
+                            continue;
+                        }
+                        cipherShift = SCANNER.nextInt();
+                        SCANNER.nextLine();
+                        showCryptMenu();
+                    }
+                }
+                case 3: {
+                    currentMode = 3;
                     showCryptMenu();
+                }
                 default:
+                    currentMode = 0;
                     System.out.println(WRONG_CHOICE);
                     System.out.println(SEPARATOR);
             }
         }
-
     }
 
-    public static void showCryptMenu() throws InterruptedException {
+    public static void showCryptMenu() throws InterruptedException, IOException {
         while (true) {
             System.out.println(HEADER);
             System.out.println(FILE_FROM_DIRECTORY_ON_PC);
@@ -103,13 +135,35 @@ public class NavigationMenu {
                 case 1: {
                     System.out.print("Введите путь к файлу, вместе с его именем и расширением: ");
                     pathOfFile = SCANNER.nextLine();
+                    FileManager fileManager = new FileManager();
+                    String currentText = fileManager.fileReader(pathOfFile);
+                    Encoder.encode(cipherShift, currentMode, currentText);
                 }
                 case 2: {
-                    System.out.print("Введите имя файла и его расширение: ");
-                    pathOfFile = SCANNER.nextLine();
+                    if (currentMode == 1) {
+                        FileManager fileManager = new FileManager();
+                        pathOfFile = "src/resources/Original_text.txt";
+                        String currentText = fileManager.fileReader(pathOfFile);
+                        Encoder.encode(cipherShift, currentMode, currentText);
+                    }
+
+                    if (currentMode == 2 || currentMode == 3) {
+                        FileManager fileManager = new FileManager();
+                        pathOfFile = "src/resources/Encoded_text.txt";
+                        String currentText = fileManager.fileReader(pathOfFile);
+                        if (currentMode == 2) {
+                            cipherShift = -cipherShift;
+                            Encoder.encode(cipherShift, currentMode, currentText);
+                        }
+                    }
                 }
-                case 9: showMainMenu();
+                case 9:
+                    pathOfFile = "";
+                    currentMode = 0;
+                    showMainMenu();
                 default:
+                    pathOfFile = "";
+                    currentMode = 0;
                     System.out.println(WRONG_CHOICE);
                     System.out.println(SEPARATOR);
             }
