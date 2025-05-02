@@ -12,6 +12,7 @@ public class Constant {
     private static final Map<Integer, Character> alphabetForSearchByChar = new HashMap<>();
     private static final Map<Character, Integer> alphabetForSearchByIndex = new HashMap<>();
 
+    //метод заполняет Map<>
     private static void stringToMap() {
         for (int i = 0; i < RESULT.length(); i++) {
             alphabetForSearchByChar.put(i, RESULT.charAt(i));
@@ -19,11 +20,13 @@ public class Constant {
         }
     }
 
+    //метод возвращает Map<> для поиска по символу
     public static Map<Integer, Character> getAlphabetForSearchByChar() {
         stringToMap();
         return alphabetForSearchByChar;
     }
 
+    //метод возвращает Map<> для поиска по индексу
     public static Map<Character, Integer> getAlphabetForSearchByIndex() {
         return alphabetForSearchByIndex;
     }

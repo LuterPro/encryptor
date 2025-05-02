@@ -1,13 +1,14 @@
 package encoder;
 
 import constants.Constant;
-import filemaneger.FileManager;
-
-import java.io.IOException;
 import java.util.Map;
 
 public class Encoder {
-    public static void encode(int shift, int mode, String textForEncoding) throws IOException {
+    /*
+    метод используется для кодирования и декодирования,
+    при декодировании используется смещение с отрицательным значением
+    */
+    public static String encode(int shift, String textForEncoding) {
         Map<Integer, Character> alphabetForSearchByChar = Constant.getAlphabetForSearchByChar();
         Map<Character, Integer> alphabetForSearchByIndex = Constant.getAlphabetForSearchByIndex();
         int alphabetSize = alphabetForSearchByIndex.size();
@@ -26,8 +27,6 @@ public class Encoder {
                 result.append(abc);
             }
         }
-
-        FileManager fileManager = new FileManager();
-        fileManager.fileWriter(result.toString(), mode);
+        return result.toString();
     }
 }

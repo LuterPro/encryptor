@@ -1,6 +1,8 @@
 package navigations;
 
+import constants.Constant;
 import encoder.Encoder;
+import exeptions.WorkWithFileException;
 import filemaneger.FileManager;
 
 import java.io.IOException;
@@ -24,20 +26,19 @@ public class NavigationMenu {
     private static final String EXIT = "0 - Передумал :)";
     private static final String BACK = "9 - Назад";
     private static final String CHOICE = "Ваш выбор: ";
+    private static final String CIPHER_INPUT = "Введите число для кодирования: ";
     private static final String WRONG_CHOICE = "Введите пожалуйста номер операции из перечисленных в меню!";
     private static final String FILE_FROM_DIRECTORY_ON_PC = "1 - Укажу путь к файлу на моём ПК";
     private static final String FILE_FROM_NAME = "2 - Использовать файл по умолчанию";
+    private static final String FILE_PATH_INPUT = "Введите путь к файлу, вместе с его именем и расширением: ";
 
-//    public static int getCipherShift() {
-//        return cipherShift;
-//    }
-//
-//    public static int getCurrentMode() {
-//        return currentMode;
-//    }
+    public static String getSeparator() {
+        return SEPARATOR;
+    }
 
-    public static void showMainMenu() throws InterruptedException, IOException {
+    public static void showMainMenu() throws InterruptedException, IOException, WorkWithFileException {
         while (true) {
+            System.out.println(SEPARATOR);
             System.out.println(HEADER);
             System.out.println(ENCRYPT);
             System.out.println(DECRYPT);
@@ -64,7 +65,7 @@ public class NavigationMenu {
                 case 1: {
                     while (true) {
                         currentMode = 1;
-                        System.out.print("Введите число для кодирования: ");
+                        System.out.print(CIPHER_INPUT);
 
                         if (!SCANNER.hasNextInt()) {
                             System.out.println(WRONG_CHOICE);
@@ -81,7 +82,7 @@ public class NavigationMenu {
                 case 2: {
                     while (true) {
                         currentMode = 2;
-                        System.out.print("Введите число для кодирования: ");
+                        System.out.print(CIPHER_INPUT);
 
                         if (!SCANNER.hasNextInt()) {
                             System.out.println(WRONG_CHOICE);
@@ -107,7 +108,7 @@ public class NavigationMenu {
         }
     }
 
-    public static void showCryptMenu() throws InterruptedException, IOException {
+    public static void showCryptMenu() throws WrongThreadException, WorkWithFileException, IOException, InterruptedException {
         while (true) {
             System.out.println(HEADER);
             System.out.println(FILE_FROM_DIRECTORY_ON_PC);
@@ -133,27 +134,93 @@ public class NavigationMenu {
                     System.exit(0);
                 }
                 case 1: {
-                    System.out.print("Введите путь к файлу, вместе с его именем и расширением: ");
+                    System.out.print(FILE_PATH_INPUT);
                     pathOfFile = SCANNER.nextLine();
                     FileManager fileManager = new FileManager();
                     String currentText = fileManager.fileReader(pathOfFile);
-                    Encoder.encode(cipherShift, currentMode, currentText);
+                    if (currentMode == 1) {
+                        String encodeResult = Encoder.encode(cipherShift, currentText);
+                        fileManager.fileWriter(encodeResult, currentMode);
+                    }
+                    if (currentMode == 2) {
+                        //cipherShift = -cipherShift;
+                        String encodeResult = Encoder.encode(-cipherShift, currentText);
+                        fileManager.fileWriter(encodeResult, currentMode);
+                    }
+                    if (currentMode == 3) {
+                        int alphabetSize = Constant.getAlphabetForSearchByIndex().size();
+                        String partOfCurrentText = currentText.substring(0, 20);
+                        int variant;
+                        for (int i = 1; i < alphabetSize; i++) {
+                            System.out.println("Вариант декодирования фрагмента текста №" + i +
+                                    " : " + Encoder.encode(-i, partOfCurrentText));
+                        }
+
+                        System.out.println(SEPARATOR);
+                        System.out.println("Введите номер приемлемого варианта, " +
+                                "для декодирования всего текста: ");
+
+                        if (!SCANNER.hasNextInt()) {
+                            System.out.println(WRONG_CHOICE);
+                            System.out.println(SEPARATOR);
+                            Thread.sleep(1000);
+                            SCANNER.nextLine();
+                            continue;
+                        }
+
+                        variant = SCANNER.nextInt();
+                        SCANNER.nextLine();
+
+                        String encodeResult = Encoder.encode(-variant, currentText);
+                        fileManager.fileWriter(encodeResult, currentMode);
+                    }
                 }
                 case 2: {
                     if (currentMode == 1) {
                         FileManager fileManager = new FileManager();
                         pathOfFile = "src/resources/Original_text.txt";
                         String currentText = fileManager.fileReader(pathOfFile);
-                        Encoder.encode(cipherShift, currentMode, currentText);
+                        String encodeResult = Encoder.encode(cipherShift, currentText);
+                        fileManager.fileWriter(encodeResult, currentMode);
                     }
 
                     if (currentMode == 2 || currentMode == 3) {
                         FileManager fileManager = new FileManager();
                         pathOfFile = "src/resources/Encoded_text.txt";
                         String currentText = fileManager.fileReader(pathOfFile);
+
                         if (currentMode == 2) {
-                            cipherShift = -cipherShift;
-                            Encoder.encode(cipherShift, currentMode, currentText);
+                            //cipherShift = -cipherShift;
+                            String encodeResult = Encoder.encode(-cipherShift, currentText);
+                            fileManager.fileWriter(encodeResult, currentMode);
+                        }
+
+                        if (currentMode == 3) {
+                            int alphabetSize = Constant.getAlphabetForSearchByIndex().size();
+                            String partOfCurrentText = currentText.substring(0, 20);
+                            int variant;
+                            for (int i = 1; i < alphabetSize; i++) {
+                                System.out.println("Вариант декодирования фрагмента текста №" + i +
+                                        " : " + Encoder.encode(-i, partOfCurrentText));
+                            }
+
+                            System.out.println(SEPARATOR);
+                            System.out.println("Введите номер приемлемого варианта, " +
+                                    "для декодирования всего текста: ");
+
+                            if (!SCANNER.hasNextInt()) {
+                                System.out.println(WRONG_CHOICE);
+                                System.out.println(SEPARATOR);
+                                Thread.sleep(1000);
+                                SCANNER.nextLine();
+                                continue;
+                            }
+
+                            variant = SCANNER.nextInt();
+                            SCANNER.nextLine();
+
+                            String encodeResult = Encoder.encode(-variant, currentText);
+                            fileManager.fileWriter(encodeResult, currentMode);
                         }
                     }
                 }
